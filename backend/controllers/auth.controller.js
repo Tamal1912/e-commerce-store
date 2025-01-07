@@ -83,14 +83,14 @@ export const login = async (req, res) => {
       
       const user = await User.findOne({ email });
       
-      console.log("here 1");
-      console.log(req.body);
+      
+      
       // if (!user) {
         //     return res.status(404).json({ message: "User not found" });
         // }
         
         if (user && (await user.comparePassword(password))) {
-      console.log("here 3");
+    
       //authenticate user
       const { access_token, refresh_token } = generateTokens(user._id);
       await storeRefreshTokens(user._id, access_token, refresh_token);
@@ -166,3 +166,13 @@ export const refreshAccessToken=async(req,res)=>{
     }
 }
 
+export const getProfile = async (req, res) => {
+  
+  try {
+    res.json(req.user);
+   
+  } catch (error) {
+    console.log("Error in getProfile controller");
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+}

@@ -1,11 +1,13 @@
 import express from "express"
-import { login, logout, refreshAccessToken, signup } from "../controllers/auth.controller.js"
+import { login, logout, refreshAccessToken, signup,getProfile } from "../controllers/auth.controller.js"
+import { protectRoute } from "../middleware/auth.middleware.js"
 
 const router=express.Router()
 
 router.post("/signup",signup)
 router.post("/login",login)
 router.post("/logout",logout)
+router.get("/profile",protectRoute,getProfile)
 router.post("/refresh_token",refreshAccessToken)
 
 

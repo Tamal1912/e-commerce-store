@@ -1,5 +1,6 @@
 import {redis} from "../lib/redis.js"
 import Product from "../models/product.model.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const getAllProducts = async(req, res) => {
     try {
@@ -38,27 +39,36 @@ export const getFeaturedProducts = async(req, res) => {
 }
 
 export const createProduct=async(req,res)=>{
- try {
-    const {name,description,price,image,category}=req.body;
 
-    let cloudinaryResponse=null;
+   
+    try {
+		const { name, description, price, image, category } = req.body;
+        if (!name || !description || !price || !image || !category) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
 
-    if(image){
-        cloudinaryResponse=await cloudinary.uploader.upload(image);
-    }
-    const product=await Product.create({
-        name,
-        description,
-        price,
-        image:cloudinaryResponse?.url?cloudinaryResponse.url:"",
-        category
-    })
+		let cloudinaryResponse = null;
 
-    res.status(201).json(product);
- } catch (error) {
-    console.log("Error in createProduct controller");
-    res.status(500).json({message:"Server Error",error:error.message});
- }
+		if (image) {
+            
+           cloudinaryResponse = await cloudinary.uploader.upload(image, {
+                folder: "products",
+            })
+		}
+
+		const product = await Product.create({
+			name,
+			description,
+			price,
+			image: cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
+			category,
+		});
+
+		res.status(201).json(product);
+	} catch (error) {
+		console.log("Error in createProduct controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
 }
 
 export const deleteProduct=async(req,res)=>{
