@@ -5,9 +5,12 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 const router=express.Router();
 
 
-router.get("/",protectRoute,addToCart)
-router.get("/",protectRoute,removeAllfromCart);
-router.get("/:id",protectRoute,updateQuantity);
+router.post("/",protectRoute,(req,res,next)=>{
+    console.log("endpoint");
+    next()
+},addToCart);
+router.delete("/",protectRoute,removeAllfromCart);
+router.put("/:id",protectRoute,updateQuantity);
 router.get("/",protectRoute,getCartProducts);
 
 

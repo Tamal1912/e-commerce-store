@@ -10,6 +10,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:5000', // Replace with your backend URL
         changeOrigin: true,
+        
       },
     },
   },

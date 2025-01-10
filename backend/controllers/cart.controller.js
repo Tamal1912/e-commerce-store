@@ -1,26 +1,29 @@
 import Product from "../models/product.model.js";
 
-export const addToCart=async(req,res)=>{
+export const addToCart = async (req, res) => {
+    console.log("adding to cart");
+
     try {
-        const {productId}=req.body;
-        const user=req.user;
+        const { productId } = req.body;
+		const user = req.user;
+        console.log(user.cartItems);
         
-        const existingProduct=user.cartItems.find(item => item.id === productId);
-        if(existingProduct){
-           existingProduct.quantity+=1;
-        }else{
-             user.cartItems.push(productId);
-        } 
+		const existingItem = user.cartItems.find((item) => item?.id === productId);
+		if (existingItem) {
+			existingItem.quantity += 1;
+		} else {
+			user.cartItems.push(productId);
+		}
 
-        await user.save();
-
-        res.json(user.cartItems);
+		await user.save();
+		res.json(user.cartItems);
 
     } catch (error) {
-        console.log("Error in addToCart controller");
-        res.status(500).json({message:"Server Error",error:error.message});
+        console.log("Error in addToCart controller", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
-}
+};
+
 
 export const removeAllfromCart=async(req,res)=>{
     try {
@@ -75,8 +78,9 @@ export const getCartProducts=async(req,res)=>{
          const item=req.user.cartItems.find(item => item.id === product.id);
          return {...product.toJSON(),quantity:item.quantity};
         })
-
-        res.json(cartItems);
+        console.log(products);
+        
+        res.json({cartItems});
     } catch (error) {
         console.log("Error in getCartProducts controller");
         res.status(500).json({message:"Server Error",error:error.message});        

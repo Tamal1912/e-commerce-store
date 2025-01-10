@@ -4,8 +4,8 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const getAllProducts = async(req, res) => {
     try {
-        const product=await Product.find({});  //find all products
-        res.json(product);
+        const products=await Product.find({});  //find all products
+        res.json({products});
     } catch (error) {
         console.log("Error in getAllProducts controller");
         res.status(500).json({message:"Server Error",error:error.message});
@@ -99,35 +99,41 @@ export const deleteProduct=async(req,res)=>{
 }
 
 
-export const getRecommendedProducts=async(req,res)=>{
-    try {
-        const product=await Product.aggregate([
-            {
-                $sample:size(3)
-            },
-            {
-                $project:{
-                    name:1,
-                    description:1,
-                    price:1,
-                    image:1,
-                    price:1,
-                }
-            }
-        ])
+export const getRecommendedProducts = async (req, res) => {
+	try {
+		const products = await Product.aggregate([
+			{
+				$sample: { size: 4 },
+			},
+			{
+				$project: {
+					_id: 1,
+					name: 1,
+					description: 1,
+					image: 1,
+					price: 1,
+				},
+			},
+		]);
 
-        res.json(product);
-    } catch (error) {
-        console.log("Error in recommendedProducts controller");
-        res.status(500).json({message:"Server Error",error:error.message});        
-    }
-}
+		res.json(products);
+	} catch (error) {
+		console.log("Error in getRecommendedProducts controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
 
 export const getProductsByCategory=async(req,res)=>{
+
+    console.log("getting products by category");
+    
     const {category}=req.params;
     try {
-        const product=await Product.find({category});
-        res.json(product);
+        const products=await Product.find({category});
+        
+        
+        res.json({products});
     } catch (error) {
         console.log("Error in getProductsByCategory controller");
         res.status(500).json({message:"Server Error",error:error.message});        
@@ -135,6 +141,7 @@ export const getProductsByCategory=async(req,res)=>{
 }
 
 export const toggleFeaturedProduct=async(req,res)=>{
+    console.log("toggling featured product");
     try {
         const product=await Product.findById(req.params.id);
         if(product){
@@ -157,14 +164,13 @@ export const toggleFeaturedProduct=async(req,res)=>{
 //update featured product cache function
 const updateFeaturedProductCache=async function(){
     try {
-
-        //lean() method is used to convert mongoose object to javascript object for better performance,
-        // not to use Everytime 
-
-        const featuredProducts=await Product.find({isFeatured:true}).lean();
-        await redis.set("featuredProducts",JSON.stringify(featuredProducts));
-    } catch (error) {
-        console.log("Error updating featured product cache");  
-    }
+		// The lean() method  is used to return plain JavaScript objects instead of full Mongoose documents. This can significantly improve performance
+         console.log("updating cache");
+         
+		const featuredProducts = await Product.find({ isFeatured: true }).lean();
+		await redis.set("featured_products", JSON.stringify(featuredProducts));
+	} catch (error) {
+		console.log("error in update cache function");
+	}
     
 }

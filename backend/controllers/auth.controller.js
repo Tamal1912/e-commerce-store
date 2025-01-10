@@ -168,7 +168,9 @@ export const refreshAccessToken=async(req,res)=>{
 
 export const getProfile = async (req, res) => {
   
+  console.log("get profile called");
   try {
+    
     res.json(req.user);
    
   } catch (error) {
