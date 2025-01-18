@@ -4,6 +4,10 @@ import { toast } from "react-hot-toast";
 import { updateQuantity } from "../../../backend/controllers/cart.controller";
 
 export const useCartStore = create((set, get) => ({
+
+  
+  
+
   cart: [],
   coupon: null,
   total: 0,
@@ -39,15 +43,17 @@ export const useCartStore = create((set, get) => ({
 		set({ cart: [], coupon: null, total: 0, subtotal: 0 });
 	},
   getCartItems: async () => {
-    console.log("get cart ");
     
-		try {
-			const res = await axios.get("/cart");
+    try {
+      const res = await axios.get("/cart");
+      console.log("getting cart items");
 			set({ cart: res.data });
+      
+      
 			get().calculateTotals();
 		} catch (error) {
 			set({ cart: [] });
-			toast.error(error.res.data.message || "An error occurred");
+			
 		}
 	},
   

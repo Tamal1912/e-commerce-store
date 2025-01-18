@@ -3,13 +3,20 @@ import { ShoppingCart, UserPlus, LogIn, LogOut, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
+import { get } from "mongoose";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
-  const { cart } = useCartStore();
+  console.log(user);
+  
+  const { cart,getCartItems } = useCartStore();
+
+  useEffect(()=>{
+    getCartItems()
+  },[getCartItems])
 
   // Safely access cart length
-  const cartLength = cart ? cart.length : 0;
+  const cartLength = cart?.length;
 
   console.log(cartLength);
 

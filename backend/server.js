@@ -6,35 +6,31 @@ import { connectDB } from "./lib/db.js"
 import productRoutes from "./routes/product.route.js"
 import cartRoutes from "./routes/cart.route.js"
 import couponRoutes from "./routes/coupon.route.js"
-import paymentRoutes from "./routes/payment.route.js"
+
+import analyticsRoutes from "./routes/analytic.route.js"
 import cors from 'cors';
-
-
 
 dotenv.config()
 
-const app=express()
+const app = express()
 
-const PORT=process.env.PORT || 5000
+const PORT = process.env.PORT || 5000
 
 app.use(cors({
   origin: 'http://localhost:5173', // Adjust to match your frontend's URL
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, // Include if cookies are used
+  credentials: true, // Allow credentials (cookies)
 }));
-app.use(express.json({limit:"30mb"}));
+app.use(express.json({ limit: "30mb" }));
 app.use(cookieParser());
 
-app.use("/api/auth",authRoutes)
-app.use("/api/product",productRoutes)
-app.use("/api/cart",cartRoutes)
-app.use("/api/coupon",couponRoutes)
-app.use("/api/payment",paymentRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/coupon", couponRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
-app.listen(PORT,()=>{
-    console.log(`server started - http://localhost:${PORT}`);
-    connectDB()
-    
-})
-
-
+app.listen(PORT, () => {
+    console.log(`Server started - http://localhost:${PORT}`);
+    connectDB();
+});

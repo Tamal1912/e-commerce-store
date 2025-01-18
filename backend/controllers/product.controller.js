@@ -13,30 +13,33 @@ export const getAllProducts = async(req, res) => {
     }
 }
 
-export const getFeaturedProducts = async(req, res) => {
-    try {
-        let featuredProducts= await redis.get("featuredProducts"); //get featured products from redis
-        if(featuredProducts){
-           return res.json(JSON.parse(featuredProducts));
-        }
-         
-         //lean() method is used to convert mongoose object to javascript object for better performance,
-        // not to use Everytime 
+export const getFeaturedProducts = async (req, res) => {
+	try {
+		let featuredProducts = await redis.get("featured_products");
+		if (featuredProducts) {
+			return res.json(JSON.parse(featuredProducts));
+		}
 
-        featuredProducts=await Product.find({isFeatured:true}).lean();//find featured products
-        if(!featuredProducts){
-          return res.status(404).json({message:"No Featured Products found"});
-        }
-        
+		// if not in redis, fetch from mongodb
+		// .lean() is gonna return a plain javascript object instead of a mongodb document
+		// which is good for performance
+		featuredProducts = await Product.find({ isFeatured: true }).lean();
 
-        //store featured products in redis for faster access
-        await redis.set("featuredProducts",JSON.stringify(featuredProducts));
-        res.json(featuredProducts);
-    } catch (error) {
-        console.log("Error in getFeaturedProducts controller");
-        res.status(500).json({message:"Server Error",error:error.message});
-    }
-}
+		if (!featuredProducts) {
+			return res.status(404).json({ message: "No featured products found" });
+		}
+
+		// store in redis for future quick access
+
+		await redis.set("featured_products", JSON.stringify(featuredProducts));
+
+		res.json(featuredProducts);
+	} catch (error) {
+		console.log("Error in getFeaturedProducts controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
 
 export const createProduct=async(req,res)=>{
 
